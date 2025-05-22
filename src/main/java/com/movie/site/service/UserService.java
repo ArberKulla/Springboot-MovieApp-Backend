@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -25,20 +26,29 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    
+    public Optional<User> getOptionalById(int id) {
+        return userRepository.findById(id);
+    }
+
+
     public User getByEmail(String email) {
         return userRepository.findByEmail(email).get();
     }
 
     @Transactional
-    
-    public User update(int id, User User) {
+    public User update(int id, User updatedUser) {
         User current = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
+        // Update fields — add more as needed
+        current.setFirstName(updatedUser.getFirstName());
+        current.setLastName(updatedUser.getLastName());
+        current.setEmail(updatedUser.getEmail());
+        current.setUserRole(updatedUser.getUserRole());
 
         return userRepository.save(current);
     }
+
 
     @Transactional
     

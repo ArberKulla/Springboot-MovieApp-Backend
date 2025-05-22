@@ -93,6 +93,35 @@ public class WatchlistService {
         ));
     }
 
+    public Page<WatchlistResponse> getFromUserId(Integer id, Integer page) {
+
+        // Default page value if not provided
+        if (page == null) {
+            page = 0;  // Default to page 1 if not provided
+        }
+
+        // Pageable with page size defined elsewhere
+        Pageable pageable = PageRequest.of(page, pageSize);  // Adjust to 0-indexed page
+
+        Page<Watchlist> watchlistPage;
+
+        watchlistPage = watchlistRepository.findByUserId(id, pageable);
+
+
+        // Mapping Watchlist to WatchlistResponse
+        return watchlistPage.map(watchlist -> new WatchlistResponse(
+                watchlist.getId(),
+                watchlist.getMovieId(),
+                watchlist.getTitle(),
+                watchlist.getDescription(),
+                watchlist.getRating(),
+                watchlist.getType(),
+                watchlist.getReleaseYear(),
+                watchlist.getPosterUrl(),
+                watchlist.getBackdropUrl()
+        ));
+    }
+
 
     @Transactional
     public Watchlist create(WatchlistDTO watchlistDTO, Principal connectedUser) {

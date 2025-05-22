@@ -2,7 +2,9 @@ package com.movie.site.controller;
 
 import com.movie.site.dto.WatchlistDTO;
 import com.movie.site.dto.WatchlistResponse;
+import com.movie.site.entity.User;
 import com.movie.site.entity.Watchlist;
+import com.movie.site.service.UserService;
 import com.movie.site.service.WatchlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,10 +16,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/watchlists")
 public class WatchlistRESTController {
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     WatchlistService watchlistService;
@@ -46,16 +52,22 @@ public class WatchlistRESTController {
         return new ResponseEntity<>(createdWatchlist, HttpStatus.OK);
     }
 
-    @GetMapping("/get/user")
+    @GetMapping("/get/user/{user_id}")
     public ResponseEntity<Page<WatchlistResponse>> getUserWatchlists(
-            Principal connectedUser,
+            @PathVariable int user_id,
             @RequestParam(required = false) Integer page) {
 
-        // Call the service layer with title and page
-        Page<WatchlistResponse> watchlistResponsePage = watchlistService.getFromUser(connectedUser, page);
+        Optional<User> userOpt = userService.getOptionalById(user_id);
+        if (userOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Call the service layer with userId and page
+        Page<WatchlistResponse> watchlistResponsePage = watchlistService.getFromUserId(user_id, page);
 
         return new ResponseEntity<>(watchlistResponsePage, HttpStatus.OK);
     }
+
 
     @PostMapping("/watchlist")
     public ResponseEntity<?> create(@RequestBody @Valid WatchlistDTO watchlistDTO, Principal connectedUser) {
