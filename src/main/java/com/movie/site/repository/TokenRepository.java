@@ -2,7 +2,9 @@ package com.movie.site.repository;
 
 import com.movie.site.entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,8 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
   List<Token> findAllValidTokenByUser(Integer id);
 
   Optional<Token> findByToken(String token);
+
+  @Modifying
+  @Query("DELETE FROM Token t WHERE t.user.id = :userId")
+  void deleteByUserId(@Param("userId") int userId);
 }

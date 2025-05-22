@@ -1,6 +1,7 @@
 package com.movie.site.service;
 
 import com.movie.site.entity.User;
+import com.movie.site.repository.TokenRepository;
 import com.movie.site.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,9 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TokenRepository tokenRepository;
 
     public List<User> getAll() {
         return userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -51,9 +55,9 @@ public class UserService {
 
 
     @Transactional
-    
-    public void deleteById(int id){
-        userRepository.deleteById(id);
+    public void deleteById(int id) {
+        tokenRepository.deleteByUserId(id); // Delete tokens first
+        userRepository.deleteById(id);      // Then delete the user
     }
 
 
